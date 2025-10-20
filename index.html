@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Генератор HTML посту</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 800px;
+    margin: 40px auto;
+    background: #f9fafc;
+    padding: 20px;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  textarea, input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    margin-top: 6px;
+    margin-bottom: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+  }
+  .checkbox-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+  }
+  label {
+    font-weight: 600;
+  }
+  button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 15px;
+  }
+  button:hover { background: #0056b3; }
+  pre {
+    background: #f0f0f0;
+    padding: 12px;
+    border-radius: 6px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+</style>
+</head>
+<body>
+
+<h2>Генератор HTML посту</h2>
+
+<label for="textInput">Форматований текст:</label>
+<textarea id="textInput" rows="8" placeholder="Введи текст сюди..."></textarea>
+
+<div class="checkbox-line">
+  <input type="checkbox" id="hasTitle" checked>
+  <label for="hasTitle">Є заголовок (перший рядок — це заголовок)</label>
+</div>
+
+<label for="imageLink">Посилання на картинку:</label>
+<input type="text" id="imageLink" placeholder="https://example.com/image.jpg" />
+
+<label for="postLink">Посилання на пост (Facebook):</label>
+<input type="text" id="postLink" placeholder="https://facebook.com/..." />
+
+<button id="generateBtn">Згенерувати HTML</button>
+
+<h3>Результат:</h3>
+<pre id="output"></pre>
+<button id="copyBtn" style="display:none;">Скопіювати HTML</button>
+
+<script>
+document.getElementById("generateBtn").addEventListener("click", () => {
+  const rawText = document.getElementById("textInput").value.trim();
+  const hasTitle = document.getElementById("hasTitle").checked;
+  const imageLink = document.getElementById("imageLink").value.trim();
+  const postLink = document.getElementById("postLink").value.trim();
+  const output = document.getElementById("output");
+  const copyBtn = document.getElementById("copyBtn");
+
+  if (!rawText) return alert("Будь ласка, введи текст.");
+
+  let title = "";
+  let bodyText = rawText;
+
+  if (hasTitle) {
+    const lines = rawText.split(/\r?\n/);
+    title = lines.shift().trim();
+    bodyText = lines.join("\n").trim();
+  }
+
+  const lines = bodyText.split(/\r?\n/).filter(l => l.trim() !== "");
+
+  const paragraphTemplate = text =>
+    `<div style="color: #050505; white-space-collapse: preserve; text-align: justify;"><span style="font-size: medium;"><span style="font-family: georgia, palatino;">${text}</span></span></div>`;
+
+  let result = `<p style="text-align: right;"><img src="${imageLink}" border="0" align="left" width="236" /></p>\n\n`;
+
+  if (lines.length < 4) {
+    result += lines.map(paragraphTemplate).join("\n\n") + "\n";
+  } else {
+    const firstPart = lines.slice(0, 3).map(paragraphTemplate).join("\n\n");
+    const secondPart = lines.slice(3).map(paragraphTemplate).join("\n\n");
+    result += firstPart + `\n\n<hr id="system-readmore" />\n` + secondPart + "\n";
+  }
+
+  result += `\n<p style="text-align: right;"><a href="${postLink}" target="_blank" style="margin: 0px; padding: 0px; font-family: Verdana, Geneva, Arial, Helvetica, sans-serif; font-size: 14px; color: #92c6e2; white-space-collapse: preserve;"><span style="margin: 0px; padding: 0px;"><span style="color: #3366ff;"><span style="font-family: georgia, palatino;">Дізнатись більше -<strong style="font-style: italic;"> </strong></span></span></span><span style="margin: 0px; padding: 0px;"><img src="http://www.nvk12.rv.ua/images/stories/News/0-2017/6-17/Facebook-create.jpg" border="0" style="border-style: solid; border-color: #8e9ea4; margin: 5px;" /></span></a></p>`;
+
+  output.textContent = result;
+  copyBtn.style.display = "inline-block";
+});
+
+document.getElementById("copyBtn").addEventListener("click", () => {
+  const text = document.getElementById("output").textContent;
+  navigator.clipboard.writeText(text);
+});
+</script>
+
+</body>
+</html>
