@@ -76,8 +76,12 @@
 <button id="copyBtn" style="display:none;">Скопіювати HTML</button>
 
 <script>
+function removeEmojis(text) {
+  return text.replace(/[\p{Extended_Pictographic}]/gu, "");
+}
+
 document.getElementById("generateBtn").addEventListener("click", () => {
-  const rawText = document.getElementById("textInput").value.trim();
+  let rawText = document.getElementById("textInput").value.trim();
   const hasTitle = document.getElementById("hasTitle").checked;
   const imageLink = document.getElementById("imageLink").value.trim();
   const postLink = document.getElementById("postLink").value.trim();
@@ -85,6 +89,8 @@ document.getElementById("generateBtn").addEventListener("click", () => {
   const copyBtn = document.getElementById("copyBtn");
 
   if (!rawText) return alert("Будь ласка, введи текст.");
+
+  rawText = removeEmojis(rawText);
 
   let title = "";
   let bodyText = rawText;
@@ -95,7 +101,7 @@ document.getElementById("generateBtn").addEventListener("click", () => {
     bodyText = lines.join("\n").trim();
   }
 
-  const lines = bodyText.split(/\r?\n/).filter(l => l.trim() !== "");
+  const lines = bodyText.split(/\r?\n/).map(l => l.trim()).filter(l => l !== "");
 
   const paragraphTemplate = text =>
     `<div style="color: #050505; white-space-collapse: preserve; text-align: justify;"><span style="font-size: medium;"><span style="font-family: georgia, palatino;">${text}</span></span></div>`;
